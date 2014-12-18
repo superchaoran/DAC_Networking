@@ -1,0 +1,36 @@
+<html>
+     <head>
+         <title>Scapi Test/Demo Tool</title>
+                <!-- SECTION 1 : Initial configuration -->
+                    <link REL="stylesheet" TYPE="text/css" href="http://searchapi.scopus.com/stylesheets/css_scapi_list_hilight.css"/>
+                        <script type="text/javascript" src="http://searchapi.scopus.com/scripts/scapi.jsp"></script>
+                        <script type="text/javascript">
+                            <!-- SECTION 2 : Call back -->
+                               callback = function(){ document.scapiForm.searchButton.disabled = false; }
+                            <!-- SECTION 3 : Running Search -->
+                               runSearch = function(){
+                               document.scapiForm.searchButton.disabled = true;
+                               var varSearchObj = new searchObj();
+                               varSearchObj.setSearch(document.scapiForm.searchString.value);
+                               scapi.search(varSearchObj);
+                               }
+                        </script>
+                <!-- SECTION 4 : Setting defaults -->
+                        <script type="text/javascript">
+                            scapi.setDeveloperID("40fcc70c0c0d4bccc9c94ac25f5d14a9");
+                            scapi.setCallback(callback);
+                        </script>
+     </head>
+<!-- SECTION 5 : Rendering page -->
+     <body>
+         <h2>Search Form:</h2>
+                  <form name="scapiForm" onsubmit="return false">
+                      <input type="text" name="searchString"/>
+                      <button onClick="runSearch()" name="searchButton"/>SEARCH</button>
+                  </form>
+         <h2>Returned SCAPI Content:</h2>
+                  <div id="scapi">
+                      None.
+                  </div>
+     </body>
+</html>
