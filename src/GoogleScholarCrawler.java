@@ -66,7 +66,7 @@ public class GoogleScholarCrawler {
 				System.out.println(count);
 				continue;
 			}
-			int randomTime = (int)(Math.random()*30)*1000+61000;
+			int randomTime = (int)(Math.random()*50)*1000+100000;
 			Thread.sleep(randomTime);
 			DataObject obj = new DataObject();
 			//for fixing /u003d
@@ -85,7 +85,7 @@ public class GoogleScholarCrawler {
 					,(P_2,[t1,t2....])......}*/
 			count++;
 			System.out.println(count);
-			bw2.write(count);
+			bw2.write(Integer.toString(count));
 			bw2.close();
 			bw.close();
 		}
@@ -109,30 +109,15 @@ public class GoogleScholarCrawler {
 		String url = "http://scholar.google.com/scholar?q="+title;
 		//String url = "http://scholar.google.com";
 		//print result
-		String htmlResult = getContent(url);
+		
+		Document doc = Jsoup.connect(url)
+			      .userAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.742.122 Safari/534.30")
+			      .referrer("http://www.google.com")
+			      .get();
+		String htmlResult = doc.html();
 		System.out.println(htmlResult);
 		return htmlResult;
 	}
-	
-	
-	  public String getContent(String url) throws ClientProtocolException, IOException{
-		  //url = "http://www.apache.org/";
-		  @SuppressWarnings({ "deprecation", "resource" })
-		  HttpClient client = new DefaultHttpClient();
-		  HttpGet request = new HttpGet(url);
-		  HttpResponse response = client.execute(request);
-
-		  // Get the response
-		  BufferedReader rd = new BufferedReader
-		    (new InputStreamReader(response.getEntity().getContent()));
-		      
-			StringBuffer retBuffer = new StringBuffer();
-			String inputLine;
-			while ((inputLine = rd.readLine()) != null) {
-				retBuffer.append(inputLine);
-			}
-			return retBuffer.toString();
-	  }
 
 	public static void processRawReturnDivs(Elements elements, BufferedWriter bw, DataObject obj) throws IOException, InterruptedException{
 		for(int i=0;i<elements.size();i++){
@@ -140,16 +125,19 @@ public class GoogleScholarCrawler {
 			
 			String ret[] = getCitedBy(currentElement);
 			String link = currentElement.select("a").first().attr("abs:href");
-			Paper p = new Paper(getTitle(currentElement),link,isDAC(link.substring(link.length()-7)));
+			Paper p = new Paper(getTitle(currentElement),link,isDAC(link.length()>6?link.substring(link.length()-7):null));
 			obj.setPaper(p);
 			if(ret == null){
 				//Cited by is not there
 				return;
 			}
 			
-			int randomTime = (int)(Math.random()*30)*1000+61000;
+			int randomTime = (int)(Math.random()*50)*1000+100000;
 			Thread.sleep(randomTime);
-			Document doc = Jsoup.connect(ret[1]).data("query", "Java").userAgent("Mozilla").cookie("auth", "token").get();
+			Document doc = Jsoup.connect(ret[1])
+		      .userAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.742.122 Safari/534.30")
+		      .referrer("http://www.google.com")
+		      .get();
 			Elements cited_by_elements = doc.select("div[class=gs_r]");
 			for(int j=0;j<cited_by_elements.size();j++){
 				Element current_cited_by_element = cited_by_elements.get(j).select("div[class=gs_ri]").first();;
